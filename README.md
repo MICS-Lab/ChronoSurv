@@ -118,13 +118,13 @@ We acknowledge [Kist et al. 2024](https://www.nature.com/articles/s41597-024-035
 ### 🔗 Citation
 
 > [!IMPORTANT]  
-> This project is based on the work by Miccinilli and Di Piazza 2025. If you use this code in your research, we would appreciate reference to the following paper:
+> This project is based on the work by Miccinilli and Di Piazza 2026. If you use this code in your research, we would appreciate reference to the following paper:
 
 ```BibTeX
-@inproceedings{mcdp2025chronosurv,
+@inproceedings{mcdp2026chronosurv,
   author    = {Hugo Miccinilli and Theo Di Piazza},
   title     = {ChronoSurv: A Clinical Pathway-Guided Graph Framework for Multimodal Survival Analysis},
   booktitle = {Arxiv preprint},
-  year      = {2025},
+  year      = {2026},
 }
 ```
