@@ -1,19 +1,17 @@
 <p align="center">
-  <h2 align="center">[Under review] Replicating Patient Follow-Up with Hierarchical Directed Graphs for Head and Neck Cancer Survival Analysis 🧪🔬🎯</h2>
+  <h2 align="center">[MICCAI 2026] ChronoSurv: A Clinical Pathway-Guided Graph Framework for Multimodal Survival Analysis 🧪🔬🎯</h2>
 </p>
 
-✅ Official implementation of the paper "Replicating Patient Follow-Up with Hierarchical Directed Graphs for Head and Neck Cancer Survival Analysis".
-
-📄 Preprint, under review for MIDL 2026: [arXiv preprint coming soon].
+📄 Official implementation for the **paper submitted for MICCAI 2026**: [arXiv submission](https://arxiv.org/abs/2404.06207)
 
 ---
 
 ### 🧩 Method Overview
 
-We propose **H2DGSurv** (Hierarchical Heterogeneous Directed Graph), a Graph Neural Network architecture for multimodal survival prediction that models the clinical pathway as a directed heterogeneous graph with temporal progression.
+We propose **ChronoSurv**, a Graph Neural Network architecture for multimodal survival prediction that models the clinical pathway as a directed heterogeneous graph with temporal progression. In the codebase, the model is exposed as `chrono_surv` with the matching datamodule type `UnifiedHNC_ChronoSurv`.
 
 <p align="center">
-  <img src="./figures/method_overview.png" alt="Method Overview" width="800">
+  <img src="./figures/method_overview.jpg" alt="Method Overview" width="800">
 </p>
 
 ---
@@ -26,8 +24,8 @@ We propose **H2DGSurv** (Hierarchical Heterogeneous Directed Graph), a Graph Neu
 
 ```bash
 # Clone the repository
-git clone https://github.com/dpmc-lab/h2dg-surv.git
-cd h2dg-surv
+git clone https://github.com/theodpzz/hancothon.git
+cd hancothon
 
 # Install dependencies
 pip install -r requirements.txt
@@ -35,24 +33,11 @@ pip install -r requirements.txt
 
 #### 📂 Dataset Preparation
 
-1. Download the [HANCOCK dataset](https://www.hancock.research.uni-erlangen.org/download)
-2. Place it in `./data/HANCOCK/`
+This project uses two head and neck cancer cohorts:
 
-#### Splits Preparation
+**1. HANCOCK** (primary dataset)
 
-**Option 1: Download pre-computed splits from Hugging Face**
-
-Download the splits directly from our [🤗 Hugging Face repository](https://huggingface.co/dpmc/h2dg-surv)
-
-Place the downloaded `folds_5.csv` in `./data/HANCOCK/Split/`
-
-**Option 2: Generate splits from scratch**
-
-```bash
-python main.py folds --data_root ./data/HANCOCK --n_folds 5 --random_seed 42
-```
-
-#### Dataset Structure
+Download the [HANCOCK dataset](https://www.hancock.research.uni-erlangen.org/download) and place it in `./data/HANCOCK/`.
 
 ```
 data/HANCOCK/
@@ -74,6 +59,29 @@ data/HANCOCK/
     └── folds_5.csv
 ```
 
+**2. TCGA-HNSC** (secondary dataset)
+
+Download [TCGA-HNSC](https://portal.gdc.cancer.gov/) clinical and WSI data and place it in `./data/TCGA-HNSC/`.
+
+```
+data/TCGA-HNSC/
+├── clinical_data.json
+├── WSI_PrimaryTumor/
+│   └── h5_files/
+└── Split/
+    └── folds_5.csv
+```
+
+#### Build K-Folds (Optional)
+
+```bash
+# HANCOCK
+python main.py folds --dataset hancock --data_root ./data/HANCOCK --n_folds 5 --random_seed 42
+
+# TCGA-HNSC
+python main.py folds --dataset tcga --data_root ./data/TCGA-HNSC --n_folds 5 --random_seed 42
+```
+
 ---
 
 ### Training
@@ -81,7 +89,7 @@ data/HANCOCK/
 #### Basic Usage
 
 ```bash
-python main.py train --config config/train/hdhg.yaml
+python main.py train --config config/chrono_surv.yaml
 
 # For all available options:
 python main.py train --help
@@ -113,9 +121,9 @@ We acknowledge [Kist et al. 2024](https://www.nature.com/articles/s41597-024-035
 > This project is based on the work by Miccinilli and Di Piazza 2025. If you use this code in your research, we would appreciate reference to the following paper:
 
 ```BibTeX
-@inproceedings{mcdp2025h2dg,
+@inproceedings{mcdp2025chronosurv,
   author    = {Hugo Miccinilli and Theo Di Piazza},
-  title     = {Replicating Patient Follow-Up with Hierarchical Directed Graphs for Head and Neck Cancer Survival Analysis},
+  title     = {ChronoSurv: A Clinical Pathway-Guided Graph Framework for Multimodal Survival Analysis},
   booktitle = {Arxiv preprint},
   year      = {2025},
 }

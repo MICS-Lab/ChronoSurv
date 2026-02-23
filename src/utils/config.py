@@ -67,10 +67,6 @@ class TrainingConfig:
         default_factory=dict, metadata={"help": "Arguments for the Lightning Module"}
     )
     
-    # Non DL Trainer parameters
-    non_dl_trainer_args: Dict[str, Any] = field(
-        default_factory=dict, metadata={"help": "Arguments for the Non DL Trainer"}
-    )
 
 
 ########################################################
@@ -93,8 +89,8 @@ class ModelConfig:
 @dataclass
 class DataConfig:
     """Data configuration (organizational)."""
-    data_root: str = field(default="./data/HANCOCK", metadata={"help": "Root path to HANCOCK dataset"})
-    datamodule_type: str = field(default="HANCOCK", metadata={"help": "Type of datamodule: 'HANCOCK' or 'HANCOCK_HierarchicalHeteroGraph' (PyG graphs)"})
+    data_root: str = field(default="./data", metadata={"help": "Root path to data directory"})
+    datamodule_type: str = field(default="UnifiedHNC_ChronoSurv", metadata={"help": "Type of datamodule: 'UnifiedHNC' or 'UnifiedHNC_ChronoSurv'"})
     data_fraction: float = field(default=1.0, metadata={"help": "Fraction of data to use"})
     
     #Model paths

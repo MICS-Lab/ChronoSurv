@@ -6,10 +6,10 @@ from typing import Tuple, List, Optional
 from dataclasses import asdict
 
 from src.utils.config import Config, TrainingConfig
-from src.model.h2dg_surv_logistic_hazard import H2DGSurvLogisticHazard
+from src.model.chrono_surv import ChronoSurv
 
 from src.training.lightning_module.base_module import BaseLightningModule
-from src.training.lightning_module.h2dg_surv_logistic_hazard_module import H2DGSurvLogisticHazardModule
+from src.training.lightning_module.chrono_surv_module import ChronoSurvModule
 
 from src.training.lightning_callback.progress_bar import CustomProgressBarCallback
 from src.training.lightning_callback.checkpoint import EnhancedModelCheckpoint
@@ -38,7 +38,7 @@ class TrainerFactory:
         Args:
             config: Full configuration object
             model: PyTorch model
-            experiment_name: Optional experiment name for logging (for later if needed)
+            experiment_name: Optional experiment name for logging
             
         Returns:
             Tuple of (trainer, lightning_module)
@@ -50,8 +50,8 @@ class TrainerFactory:
     @staticmethod
     def _create_lightning_module(training_config: TrainingConfig, model: nn.Module) -> BaseLightningModule:
         """Create Lightning Module from config by extracting explicit parameters."""        
-        if isinstance(model, H2DGSurvLogisticHazard):
-            return H2DGSurvLogisticHazardModule(
+        if isinstance(model, ChronoSurv):
+            return ChronoSurvModule(
                 model=model,
                 **asdict(training_config.optimizer),
                 **asdict(training_config.scheduler),
@@ -119,7 +119,7 @@ class TrainerFactory:
             filename="best",
             every_n_epochs=checkpoint_config.save_interval,
             verbose=checkpoint_config.verbose,
-            enable_version_counter = False, # Otherwise it will create best-v1.ckpt, best-v2.ckpt, etc.
+            enable_version_counter = False,
         )
         callbacks.append(checkpoint_callback)
         

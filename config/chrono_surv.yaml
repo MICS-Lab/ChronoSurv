@@ -1,0 +1,73 @@
+gpu_index: 0
+
+# Data configuration
+data:
+  datamodule_type: "UnifiedHNC_ChronoSurv"
+  data_root: "./data"
+
+  # Model paths
+  path_optimus: "./data/models/H-optimus-1"
+  path_lm: "./data/models/Bio_ClinicalBERT"
+  path_kimianet: "./data/models/kimia_net.pth"
+
+  # Tokenization parameters (for HANCOCK text modality)
+  max_tokens_history: 200
+  max_tokens_surgery: 512
+  max_tokens_report: 60
+  padding: 'max_length'
+  truncation: True
+
+  # Time discretization
+  num_time_bins: 100
+
+  # Folds
+  k: 5
+  fold: 1
+
+  aggregate_images: True
+
+# Model configuration
+model:
+  name: "chrono_surv"
+  args:
+    hidden_dim: 512
+    num_heads: 4
+    dropout: 0.35
+    freeze_text_encoder: True
+    hidden_reduction_factors: [2, 4, 6]
+
+# Training configuration
+training:
+  batch_size: 8
+  epochs: 400
+  num_workers: 4
+  seed: 42
+
+  lightning_module_args:
+    T_max: 4963
+    scheme: "equidistant"
+    lambda_xcal: 7.0
+    xcal_nbins: 28
+    lambda_ranking: 0.0
+    ranking_margin: 0.0
+    temperature: 1.5
+
+  optimizer:
+    optimizer_name: "AdamW"
+    learning_rate: 0.0003
+    weight_decay: 0.0005
+
+  scheduler:
+    scheduler_name: "CosineAnnealingLR"
+    scheduler_eta_min: 0.00001
+    scheduler_T_max: 400
+
+  checkpoints:
+    checkpoint_dir: "results/chrono_surv"
+    patience: 75
+    delta: 0.0
+    save_interval: 1
+    verbose: False
+
+  learning_stat:
+    main_metric: "ibs"

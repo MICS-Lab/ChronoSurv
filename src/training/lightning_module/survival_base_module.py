@@ -189,6 +189,23 @@ class SurvivalBaseLightningModule(BaseLightningModule):
             risk_scores=risk_scores_np,
             stage=stage
         )
+        
+        # Compute composite metric: c_index - ibs (higher is better)
+        # This balances discrimination (c_index) and calibration (ibs)
+        self._compute_and_log_composite_metric(stage=stage)
+    
+    def _compute_and_log_composite_metric(self, stage: str) -> None:
+        """
+        Compute and log composite metric: c_index_norm - ibs_norm.
+        """
+        c_index = self.logged_metrics_cache.get(f"{stage}/c_index")
+        ibs = self.logged_metrics_cache.get(f"{stage}/ibs")
+        
+        if c_index is not None and ibs is not None:
+            # c_index - ibs (maximize, higher is better)
+            composite = c_index - ibs
+            self.log(f"{stage}/c_index_minus_ibs", composite, on_epoch=True, prog_bar=False, sync_dist=True)
+            self.logged_metrics_cache[f"{stage}/c_index_minus_ibs"] = float(composite)
     
     def _compute_and_log_ibs(
         self,

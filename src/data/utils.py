@@ -2,22 +2,25 @@ import torch
 import tqdm
 import numpy as np
 import pandas as pd
-from typing import Literal, Tuple
+import lightning as L
+from typing import Literal, Tuple, Optional
 from transformers import AutoModel
 
-from src.data.datamodule.datamodule import HANCOCKDataModule
-from src.data.datamodule.h2dg_surv_datamodule import H2DGSurvDataModule
+from src.data.datamodule.chrono_surv_unified_hnc import ChronoSurvUnifiedHNCDataModule
 
 
 def process_to_array(
-    datamodule: HANCOCKDataModule,
+    datamodule: L.LightningDataModule,
     stage: Literal["train", "val", "test", "predict"]
 ) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Transform multimodal HANCOCK data into a flat feature matrix for classical ML models.
+    Transform multimodal data into a flat feature matrix for classical ML models.
+    
+    Supports Unified HNC datasets. Automatically detects which
+    modalities are present based on input_dims and only processes those.
     
     Args:
-        datamodule: HANCOCK datamodule containing the data loaders
+        datamodule: DataModule containing the data loaders
         stage: Data split to process (train/val/test/predict)
     
     Returns:
@@ -28,17 +31,29 @@ def process_to_array(
             - patient_ids: Patient identifiers
     """
     time_to_event, survival_status, patient_ids = [], [], []
-    clinica_list, blood_list, patho_list, cdm_list, h_embeddings_list, s_embeddings_list, r_embeddings_list, lymph_list, tumor_list = [], [], [], [], [], [], [], [], []
+    clinica_list, blood_list, patho_list, lymph_list, tumor_list = [], [], [], [], []
+    h_embeddings_list, s_embeddings_list, r_embeddings_list = [], [], []
 
-    # Load text encoder (BioBERT) for text embedding extraction
-    text_encoder = AutoModel.from_pretrained(
-        datamodule.path_lm, 
-        local_files_only=True
-    )
-    text_encoder.eval()
+    # Get input dims to know which modalities are available
+    input_dims = datamodule.get_input_dims()
+    has_clinical = input_dims.get("clinical", 0) > 0
+    has_blood = input_dims.get("blood", 0) > 0
+    has_pathological = input_dims.get("pathological", 0) > 0
+    has_text = input_dims.get("text", 0) > 0
+    has_lymphnode = input_dims.get("lymphnode", 0) > 0
+    has_primarytumor = input_dims.get("primarytumor", 0) > 0
+
+    # Load text encoder only if text modality is present
+    text_encoder = None
+    if has_text and hasattr(datamodule, 'path_lm'):
+        text_encoder = AutoModel.from_pretrained(
+            datamodule.path_lm, 
+            local_files_only=True
+        )
+        text_encoder.eval()
     
-    # Handle HeteroGraph DataModule: use base datasets instead of graph-wrapped ones
-    if isinstance(datamodule, H2DGSurvDataModule):
+    # Handle HeteroGraph DataModules: use base datasets instead of graph-wrapped ones
+    if isinstance(datamodule, ChronoSurvUnifiedHNCDataModule):
         if stage == "train":
             dataset = datamodule.base_train_dataset
         elif stage == "val":
@@ -60,62 +75,76 @@ def process_to_array(
         elif stage in ["test", "predict"]:
             datadloader = datamodule.test_dataloader()
     
-    # Process batches and extract text embeddings (CLS token)
+    # Process batches
     with torch.no_grad():
         for p_id, input, target in tqdm.tqdm(datadloader, desc=f"Parse to Array: {stage} data", unit="batch"):
             time_to_event.append(target[0])
             survival_status.append(target[1])
-            patient_ids.append(p_id)
             
-            clinical, blood, patho, cdm, h_ids, h_mask, s_ids, s_mask, r_ids, r_mask, lymph, tumor = input
+            # Handle patient_ids (may be tensor for HANCOCK, list for TCGA)
+            if isinstance(p_id, torch.Tensor):
+                patient_ids.append(p_id)
+            else:
+                patient_ids.extend(p_id)
             
-            # Squeeze extra dimension from tokenization (shape: [batch, 1, seq] -> [batch, seq])
-            h_ids, h_mask = h_ids.squeeze(1), h_mask.squeeze(1)
-            s_ids, s_mask = s_ids.squeeze(1), s_mask.squeeze(1)
-            r_ids, r_mask = r_ids.squeeze(1), r_mask.squeeze(1)
+            clinical, blood, patho, h_ids, h_mask, s_ids, s_mask, r_ids, r_mask, lymph, tumor = input
             
-            # Extract text embeddings: histories, surgery descriptions, reports
-            h_embeddings = text_encoder(h_ids, h_mask).last_hidden_state[:, 0, :]
-            s_embeddings = text_encoder(s_ids, s_mask).last_hidden_state[:, 0, :]
-            r_embeddings = text_encoder(r_ids, r_mask).last_hidden_state[:, 0, :]
+            # Collect available modalities
+            if has_clinical:
+                clinica_list.append(clinical)
+            if has_blood:
+                blood_list.append(blood)
+            if has_pathological:
+                patho_list.append(patho)
+            if has_lymphnode:
+                lymph_list.append(lymph)
+            if has_primarytumor:
+                tumor_list.append(tumor)
             
-            clinica_list.append(clinical)
-            blood_list.append(blood)
-            patho_list.append(patho)
-            cdm_list.append(cdm)
-            h_embeddings_list.append(h_embeddings)
-            s_embeddings_list.append(s_embeddings)
-            r_embeddings_list.append(r_embeddings)
-            lymph_list.append(lymph)
-            tumor_list.append(tumor)
+            # Extract text embeddings (only if text is present)
+            if has_text and text_encoder is not None:
+                # Squeeze extra dimension from tokenization (shape: [batch, 1, seq] -> [batch, seq])
+                h_ids, h_mask = h_ids.squeeze(1), h_mask.squeeze(1)
+                s_ids, s_mask = s_ids.squeeze(1), s_mask.squeeze(1)
+                r_ids, r_mask = r_ids.squeeze(1), r_mask.squeeze(1)
+                
+                h_embeddings = text_encoder(h_ids, h_mask).last_hidden_state[:, 0, :]
+                s_embeddings = text_encoder(s_ids, s_mask).last_hidden_state[:, 0, :]
+                r_embeddings = text_encoder(r_ids, r_mask).last_hidden_state[:, 0, :]
+                
+                h_embeddings_list.append(h_embeddings)
+                s_embeddings_list.append(s_embeddings)
+                r_embeddings_list.append(r_embeddings)
 
-    # Concatenate all modalities into arrays
-    clinica_array = np.concatenate(clinica_list)
-    blood_array = np.concatenate(blood_list)
-    patho_array = np.concatenate(patho_list)
-    cdm_array = np.concatenate(cdm_list)
-    h_embeddings_array = np.concatenate(h_embeddings_list)
-    s_embeddings_array = np.concatenate(s_embeddings_list)
-    r_embeddings_array = np.concatenate(r_embeddings_list)
-    lymph_array = np.concatenate(lymph_list)
-    tumor_array = np.concatenate(tumor_list)
+    # Build feature matrix from available modalities
+    arrays_to_concat = []
+    
+    if has_clinical:
+        arrays_to_concat.append(np.concatenate(clinica_list))
+    if has_blood:
+        arrays_to_concat.append(np.concatenate(blood_list))
+    if has_pathological:
+        arrays_to_concat.append(np.concatenate(patho_list))
+    if has_text and text_encoder is not None:
+        arrays_to_concat.append(np.concatenate(h_embeddings_list))
+        arrays_to_concat.append(np.concatenate(s_embeddings_list))
+        arrays_to_concat.append(np.concatenate(r_embeddings_list))
+    if has_lymphnode:
+        arrays_to_concat.append(np.concatenate(lymph_list))
+    if has_primarytumor:
+        arrays_to_concat.append(np.concatenate(tumor_list))
 
     # Early fusion of all features into a single flat matrix
-    X = np.concatenate([
-        clinica_array,
-        blood_array,
-        patho_array,
-        cdm_array,
-        h_embeddings_array,
-        s_embeddings_array,
-        r_embeddings_array,
-        lymph_array,
-        tumor_array
-    ], axis=1)
+    X = np.concatenate(arrays_to_concat, axis=1)
     X = pd.DataFrame(X)
 
     time_to_event = np.concatenate(time_to_event)
     survival_status = np.concatenate(survival_status)
-    patient_ids = np.concatenate(patient_ids)
+    
+    # Handle patient_ids (tensor or list)
+    if isinstance(patient_ids[0], torch.Tensor):
+        patient_ids = np.concatenate(patient_ids)
+    else:
+        patient_ids = np.array(patient_ids)
     
     return X, time_to_event, survival_status, patient_ids

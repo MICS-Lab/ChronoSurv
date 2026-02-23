@@ -84,8 +84,14 @@ class BaseLightningModule(L.LightningModule):
     @staticmethod
     def get_metric_mode(metric: str) -> Literal["min", "max"]:
         """Get the mode for the main metric."""
+        #TODO: bad way to do this, should be more robust
+        max_metrics = ["c_index"]
+        if any(m in metric.lower() for m in max_metrics):
+            return "max"
         min_metrics = ["loss", "ibs", "error", "mae", "mse", "rmse"]
-        return "min" if any(m in metric.lower() for m in min_metrics) else "max"
+        if any(m in metric.lower() for m in min_metrics):
+            return "min"
+        return "max"
 
     ########################################################
     # Lightning Hooks

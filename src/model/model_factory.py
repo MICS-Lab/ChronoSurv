@@ -2,7 +2,7 @@ import torch.nn as nn
 from typing import Dict
 
 from src.utils.config import ModelConfig, DataConfig
-from src.model.h2dg_surv_logistic_hazard import H2DGSurvLogisticHazard
+from src.model.chrono_surv import ChronoSurv
 
 
 class ModelFactory:
@@ -11,9 +11,8 @@ class ModelFactory:
     Takes a ModelConfig and DataConfig and returns the appropriate PyTorch model.
     """
     
-    # Registry of available models
     _MODELS = {
-        "h2dg_surv": H2DGSurvLogisticHazard,
+        "chrono_surv": ChronoSurv,
     }
     
     @staticmethod
@@ -50,11 +49,9 @@ class ModelFactory:
             )
         model_class = ModelFactory._MODELS[model_name]
         
-        # Use num_time_bins if specified, otherwise use t_max (1 bin per day)
         num_bins = data_config.num_time_bins if data_config.num_time_bins is not None else t_max
         kwargs["num_bins"] = num_bins
         
-        # Create model with input dimensions and text model path
         model = model_class(
             input_dims=input_dims,
             lm_path=data_config.path_lm,

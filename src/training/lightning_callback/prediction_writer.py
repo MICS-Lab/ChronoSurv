@@ -56,14 +56,28 @@ class SurvivalPredictionWriter(BasePredictionWriter):
             df = self._build_df(preds)
             df.to_csv(f"{self.output_dir}/predictions_{self.split_names[dl_idx]}.csv", index=False)
     
+    def _concat_patient_ids(self, predictions) -> pd.Series:
+        patient_ids = []
+        tensor_patient_ids = []
+        for prediction in predictions:
+            p_id = prediction["p_id"]
+            if isinstance(p_id, torch.Tensor):
+                tensor_patient_ids.append(p_id)
+            else:
+                patient_ids.extend(list(p_id))
+
+        if tensor_patient_ids:
+            patient_ids.extend(torch.cat(tensor_patient_ids).cpu().numpy().tolist())
+
+        return pd.Series(patient_ids)
+
     def _build_df(self, predictions) -> pd.DataFrame:
-        all_p_ids = torch.cat([p["p_id"] for p in predictions])
         all_times = torch.cat([p["time"] for p in predictions])
         all_events = torch.cat([p["event"] for p in predictions])
         all_risk_scores = torch.cat([p["risk_scores"] for p in predictions])
         
         df_data = {
-            "patient_id": all_p_ids.cpu().numpy(),
+            "patient_id": self._concat_patient_ids(predictions).values,
             "time": all_times.cpu().numpy(),
             "event": all_events.cpu().numpy(),
             "risk_score": all_risk_scores.cpu().numpy()

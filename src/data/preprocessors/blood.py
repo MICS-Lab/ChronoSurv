@@ -8,6 +8,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 
+pd.set_option('future.no_silent_downcasting', True)
+
 
 def load_blood_data(data_root: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Load blood data and reference ranges."""
@@ -41,8 +43,7 @@ def fill_missing_patients(df: pd.DataFrame, data_clinical: pd.DataFrame) -> pd.D
     
     df_complete = all_combinations.merge(df, on=['patient_id', 'analyte_name'], how='left')
     # Fill new rows (created by cartesian product) with row_existed=False
-    df_complete['row_existed'] = df_complete['row_existed'].fillna(False)
-    df_complete['row_existed'] = df_complete['row_existed'].astype(int)
+    df_complete['row_existed'] = df_complete['row_existed'].fillna(False).infer_objects(copy=False).astype(int)
     
     return df_complete
 
