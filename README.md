@@ -28,8 +28,8 @@ We propose **ChronoSurv**, a Graph Neural Network architecture for multimodal su
 
 ```bash
 # Clone the repository
-git clone https://github.com/theodpzz/hancothon.git
-cd hancothon
+git clone https://github.com/anonymized/ChronoSurv.git
+cd ChronoSurv
 
 # Install dependencies
 pip install -r requirements.txt
