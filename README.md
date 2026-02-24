@@ -3,9 +3,7 @@
 </p>
 
 <p align="center">
-  <!-- <a href="https://arxiv.org/abs/2404.06207"><img src="https://img.shields.io/badge/arXiv-2404.06207-b31b1b.svg" alt="arXiv"></a> -->
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.12+-blue.svg" alt="Python 3.12+"></a>
-  <!-- <a href="https://conferences.miccai.org/2026/"><img src="https://img.shields.io/badge/MICCAI-2026-4b44ce.svg" alt="MICCAI 2026"></a> -->
 </p>
 
 ---
@@ -116,19 +114,3 @@ We acknowledge [Kist et al. 2024](https://www.nature.com/articles/s41597-024-035
 
 - [HANCOCK Challenge](https://www.hancock.research.uni-erlangen.org/download)
 - [BioClinicalBERT](https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT)
-
-<!-- ---
-
-### 🔗 Citation
-
-> [!IMPORTANT]  
-> This project is based on the work by Miccinilli and Di Piazza 2026. If you use this code in your research, we would appreciate reference to the following paper:
-
-```BibTeX
-@inproceedings{mcdp2026chronosurv,
-  author    = {Hugo Miccinilli and Theo Di Piazza},
-  title     = {ChronoSurv: A Clinical Pathway-Guided Graph Framework for Multimodal Survival Analysis},
-  booktitle = {Arxiv preprint},
-  year      = {2026},
-}
-``` -->
