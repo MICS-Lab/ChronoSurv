@@ -6,9 +6,7 @@ data:
   data_root: "./data"
 
   # Model paths
-  path_optimus: "./data/models/H-optimus-1"
   path_lm: "./data/models/Bio_ClinicalBERT"
-  path_kimianet: "./data/models/kimia_net.pth"
 
   # Tokenization parameters (for HANCOCK text modality)
   max_tokens_history: 200
