@@ -23,6 +23,7 @@ We propose **ChronoSurv**, a Graph Neural Network architecture for multimodal su
 #### Installation
 
 **Requirements:** Python 3.12+
+(anonymized for review)
 
 ```bash
 # Clone the repository
@@ -114,3 +115,19 @@ We acknowledge [Kist et al. 2024](https://www.nature.com/articles/s41597-024-035
 
 - [HANCOCK Challenge](https://www.hancock.research.uni-erlangen.org/download)
 - [BioClinicalBERT](https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT)
+
+---
+
+### 🔗 Citation
+
+> [!IMPORTANT]  
+> This project is based on the work by Anonymous 2026. If you use this code in your research, we would appreciate reference to the following paper:
+
+```BibTeX
+@inproceedings{2026chronosurv,
+  author    = {Anonymous},
+  title     = {ChronoSurv: A Clinical Pathway-Guided Graph Framework for Multimodal Survival Analysis},
+  booktitle = {Arxiv preprint},
+  year      = {2026},
+}
+```
