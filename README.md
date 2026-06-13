@@ -130,6 +130,6 @@ We acknowledge [Kist et al. 2024](https://www.nature.com/articles/s41597-024-035
   author    = {Hugo Miccinilli and Theo Di Piazza},
   title     = {ChronoSurv: A Clinical Pathway-Guided Graph Framework for Multimodal Survival Analysis},
   booktitle = {International Conference on Medical Image Computing and Computer-Assisted Intervention (MICCAI)},
-  year = {2026},
+  year      = {2026},
 }
 ```
