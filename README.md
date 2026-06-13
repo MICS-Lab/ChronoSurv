@@ -25,11 +25,10 @@ We propose **ChronoSurv**, a Graph Neural Network architecture for multimodal su
 #### Installation
 
 **Requirements:** Python 3.12+
-(anonymized for review)
 
 ```bash
 # Clone the repository
-git clone https://github.com/anonymized/ChronoSurv.git
+git clone https://github.com/dpmc-lab/ChronoSurv.git
 cd ChronoSurv
 
 # Install dependencies
