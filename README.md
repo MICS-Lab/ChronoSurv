@@ -1,5 +1,6 @@
 <p align="center">
-  <h2 align="center">[MICCAI 2026] ChronoSurv: A Clinical Pathway-Guided Graph Framework for Multimodal Survival Analysis 🧪🔬🎯</h2>
+  <h2 align="center">ChronoSurv: A Clinical Pathway-Guided Graph Framework for Multimodal Survival Analysis 🧪🔬🎯</h2>
+  <h3 align="center"><b>MICCAI 2026</b></h3>
 </p>
 
 <p align="center">
