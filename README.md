@@ -29,7 +29,7 @@ We propose **ChronoSurv**, a Graph Neural Network architecture for multimodal su
 
 ```bash
 # Clone the repository
-git clone https://github.com/dpmc-lab/ChronoSurv.git
+git clone https://github.com/MICS-Lab/ChronoSurv.git
 cd ChronoSurv
 
 # Install dependencies
