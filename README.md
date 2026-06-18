@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  <a href="https://arxiv.org/abs/2404.06207"><img src="https://img.shields.io/badge/arXiv-2404.06207-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://arxiv.org/abs/2606.19140"><img src="https://img.shields.io/badge/arXiv-2404.06207-b31b1b.svg" alt="arXiv"></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.12+-blue.svg" alt="Python 3.12+"></a>
   <a href="https://conferences.miccai.org/2026/"><img src="https://img.shields.io/badge/MICCAI-2026-4b44ce.svg" alt="MICCAI 2026"></a>
 </p>
