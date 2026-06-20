@@ -111,7 +111,7 @@ python main.py eval --checkpoint-dirs [checkpoint-dirs]
 
 ### 🙌 Acknowledgments
 
-We acknowledge [Kist et al. 2024](https://www.nature.com/articles/s41597-024-03596-3) for making the HANCOCK dataset available.
+We acknowledge [Kist et al. 2024](https://www.nature.com/articles/s41597-024-03596-3) and [The Cancer Genome Atlas Network](https://www.nature.com/articles/nature14129) for making the HANCOCK and the TCGA datasets available.
 
 ### Useful Links
 
